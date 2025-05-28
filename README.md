@@ -1,230 +1,197 @@
-# Stock Data Generation & Changepoint Detection
+# Comprehensive Stock Market Dataset & Generation Tools
 
-A comprehensive toolkit for generating raw stock market data with alphavantage. It also contains a few changepoint detection algorithms I have been experimenting with.
+A massive stock market dataset and toolkit for generating high-frequency financial data, featuring 6,500+ tickers with 15-minute interval data organized by market sectors.
 
-## Overview
+## 📊 Dataset Overview
 
-This repository contains two main components:
+This repository provides access to one of the most comprehensive stock market datasets available, featuring:
 
-1. **Raw Stock Data Generation**: Tools for fetching and managing 15-minute interval stock market data from AlphaVantage API
-2. **Changepoint Detection**: Implementation of various Bayesian changepoint detection algorithms, including Dynamic State Model BOCD (DSM-BOCD)
+- **🔢 6,564 individual stock tickers** across all major US exchanges
+- **📈 15-minute interval OHLCV data** (Open, High, Low, Close, Volume)
+- **📅 Historical coverage** from 1999 to present
+- **🏢 Complete sector organization** across 12 major market sectors
+- **💾 Multi-gigabyte dataset** with validated, clean data
+- **🔗 Available on Hugging Face**: [brandonyeequon/stock-market-data-warehouse](https://huggingface.co/datasets/brandonyeequon/stock-market-data-warehouse)
 
-## Features
+### Sector Coverage
 
-### Stock Data Generation
-- ✅ AlphaVantage API integration for 15-minute interval data
-- ✅ Rate limiting and error handling
-- ✅ Data validation and quality checks
-- ✅ Bulk data fetching by month/year or ticker
-- ✅ CSV output format organized by sectors
-- ✅ Data management utilities
+The dataset is organized across **12 major market sectors**:
 
-### Changepoint Detection
-- ✅ Dynamic State Model Bayesian Online Changepoint Detection (DSM-BOCD)
-- ✅ Standard Bayesian Online Changepoint Detection (BOCD)
-- ✅ Nonparametric Bayesian changepoint detection with KDE
-- ✅ Online and batch processing modes
-- ✅ Multiple statistical models (Gaussian, DSM-Gaussian)
-- ✅ Configurable hazard functions
+- **Basic Materials** (146 tickers): Mining, chemicals, forestry, paper
+- **Consumer Discretionary** (845 tickers): Retail, media, automotive, leisure  
+- **Consumer Staples** (168 tickers): Food, beverages, household products
+- **Energy** (244 tickers): Oil, gas, renewable energy, utilities
+- **Financials** (923 tickers): Banks, insurance, real estate, investment
+- **Healthcare** (789 tickers): Pharmaceuticals, biotech, medical devices
+- **Industrials** (768 tickers): Aerospace, defense, construction, transportation
+- **Technology** (1,347 tickers): Software, hardware, semiconductors, telecommunications
+- **Telecommunications** (83 tickers): Telecom services and infrastructure
+- **Utilities** (158 tickers): Electric, gas, water utilities
+- **Real Estate** (267 tickers): REITs and real estate companies
+- **Other** (826 tickers): Miscellaneous and hybrid sector companies
 
-## Installation
+### Data Format
 
-```bash
-git clone <repository-url>
-cd stock-data-changepoint-detection
-pip install -r requirements.txt
+Each CSV file contains standardized columns:
+- `timestamp`: ISO format datetime (15-minute intervals)
+- `open`: Opening price for the interval
+- `high`: Highest price during the interval  
+- `low`: Lowest price during the interval
+- `close`: Closing price for the interval
+- `volume`: Trading volume for the interval
+
+## 🛠️ Data Generation Tools
+
+This repository includes the complete toolkit used to generate and manage this massive dataset:
+
+### AlphaVantage API Integration
+- **Rate-limited fetching**: Respects API limits with intelligent retry logic
+- **Bulk data collection**: Download by ticker, month, or year ranges
+- **Error handling**: Robust validation and bad data replacement
+- **Sector organization**: Automatic filing into appropriate sector directories
+
+### Data Management Utilities
+- **Quality validation**: Automated data integrity checks
+- **Ticker management**: Clean and maintain ticker lists
+- **Data combination**: Merge and analyze datasets across tickers
+- **Storage optimization**: Efficient CSV storage with sector organization
+
+## 🚀 Quick Start
+
+### Using Pre-Generated Dataset
+
+```python
+import pandas as pd
+
+# Load data for any ticker (example: Apple)
+df = pd.read_csv("data_warehouse/15_min_interval_stocks/Technology/AAPL.csv")
+print(f"AAPL data: {len(df)} rows from {df['timestamp'].min()} to {df['timestamp'].max()}")
 ```
 
-### Dependencies
-
-```bash
-pip install numpy pandas scipy matplotlib seaborn
-pip install scikit-learn
-pip install requests  # For AlphaVantage API
-```
-
-## Quick Start
-
-### 1. Stock Data Generation
+### Generating New Data
 
 ```python
 from data_clients.pull_by_ticker import fetch_stock_data
 
-# Fetch data for a specific ticker
-fetch_stock_data("AAPL", "2024", "01", api_key="your_alphavantage_key")
+# Generate data for additional tickers
+fetch_stock_data("NVDA", "2024", "01", api_key="your_alphavantage_key")
 ```
 
-### 2. Changepoint Detection
-
-```python
-from changepoint_detection.dsm_bocd.bocpd import BOCPD
-from changepoint_detection.dsm_bocd.models import DSMGaussian
-from changepoint_detection.dsm_bocd.hazard import ConstantHazard
-
-# Initialize DSM-BOCD
-model = DSMGaussian(mean0=0, var0=1, varx=1)
-hazard = ConstantHazard(lam=250)
-bocd = BOCPD(model=model, hazard=hazard)
-
-# Detect changepoints in your data
-for x in data:
-    bocd.update(x)
-    
-# Get changepoint probabilities
-changepoint_probs = bocd.get_changepoint_probabilities()
-```
-
-## Repository Structure
+## 📁 Repository Structure
 
 ```
 stock-data-changepoint-detection/
-├── data_clients/                    # Stock data fetching
-│   ├── pull_by_month.py            # Fetch data by month/year
-│   ├── pull_by_ticker.py           # Fetch data by ticker symbol
-│   ├── replace_bad_data.py         # Data quality management
-│   └── validate_set2.py            # Data validation
-├── data_managers/                   # Data management utilities
-│   ├── stock_data_manager.py       # Data warehouse management
-│   ├── clean_tickers.py            # Ticker list cleaning
-│   └── combine.py                  # Data combination utilities
-├── changepoint_detection/
-│   ├── dsm_bocd/                   # DSM-BOCD implementation
-│   │   ├── bocpd.py               # Main BOCD algorithm
-│   │   ├── dsm-bocd_realworld.py  # Real-world application
-│   │   ├── models.py              # Statistical models
-│   │   ├── hazard.py              # Hazard functions
-│   │   ├── omega_estimator.py     # Parameter estimation
-│   │   └── utils/                 # Utility functions
-│   │       ├── find_cp.py         # Changepoint detection
-│   │       └── generate_data.py   # Data generation
-│   └── bayesian_methods/           # Alternative implementations
-│       ├── optimized_bayesian.py  # Nonparametric BOCD
-│       ├── online_kbocd.py        # Kernel-based BOCD
-│       └── ...                    # Other experimental methods
-├── utils/                          # General utilities
-│   └── processor.py               # Data processing
-├── examples/                       # Example scripts
-│   └── test_DSM-bocd.py           # DSM-BOCD example
-└── README.md                      # This file
+├── data_clients/           # AlphaVantage API data fetching tools
+│   ├── pull_by_month.py   # Fetch data by time periods
+│   ├── pull_by_ticker.py  # Fetch data by stock symbols
+│   └── validate_set2.py   # Data validation utilities
+├── data_managers/          # Dataset management and analysis
+│   ├── stock_data_manager.py  # Data warehouse operations
+│   ├── clean_tickers.py       # Ticker list maintenance
+│   └── combine.py             # Data aggregation tools
+├── changepoint_detection/  # Bonus: Changepoint detection algorithms
+│   ├── dsm_bocd/          # DSM-BOCD implementation
+│   └── bayesian_methods/   # Alternative Bayesian methods
+└── examples/              # Usage examples and tutorials
 ```
 
-## Algorithms
+## 💾 Dataset Access
 
-### Dynamic State Model BOCD (DSM-BOCD)
+### Hugging Face Hub
+The complete dataset is available on Hugging Face:
 
-DSM-BOCD extends traditional BOCD by incorporating a dynamic state model that adapts to changing data characteristics. Key features:
-
-- **Adaptive Parameters**: Model parameters evolve over time
-- **Improved Accuracy**: Better performance on non-stationary data
-- **Real-time Processing**: Online algorithm suitable for streaming data
-
-### Nonparametric Bayesian Methods
-
-Alternative implementations using kernel density estimation:
-
-- **Kernel-based BOCD**: Uses KDE for predictive modeling
-- **Adaptive Bandwidth**: ISJ bandwidth selection for optimal performance
-- **Fully Nonparametric**: No distributional assumptions
-
-## Data Sources
-
-### AlphaVantage API
-
-The stock data generation tools use the AlphaVantage API to fetch:
-- 15-minute interval OHLCV data
-- Historical data dating back to 1999
-- Coverage of 6,500+ stock tickers
-- Organized by market sectors
-
-**API Key Required**: Get your free API key at [AlphaVantage](https://www.alphavantage.co/)
-
-## Usage Examples
-
-### Complete Pipeline Example
+**🔗 [brandonyeequon/stock-market-data-warehouse](https://huggingface.co/datasets/brandonyeequon/stock-market-data-warehouse)**
 
 ```python
-# 1. Fetch stock data
-from data_clients.pull_by_ticker import main as fetch_data
-fetch_data()  # Fetches data for configured tickers
+from datasets import load_dataset
 
-# 2. Load and process data
-import pandas as pd
-data = pd.read_csv("path/to/your/stock_data.csv")
-prices = data['close'].values
-
-# 3. Detect changepoints
-from changepoint_detection.dsm_bocd.bocpd import BOCPD
-from changepoint_detection.dsm_bocd.models import DSMGaussian
-from changepoint_detection.dsm_bocd.hazard import ConstantHazard
-
-model = DSMGaussian(mean0=prices[0], var0=1, varx=1)
-hazard = ConstantHazard(lam=250)  # Expected run length
-bocd = BOCPD(model=model, hazard=hazard)
-
-changepoints = []
-for i, price in enumerate(prices):
-    bocd.update(price)
-    if i > 0:
-        cp_prob = bocd.get_most_recent_changepoint_prob()
-        if cp_prob > 0.5:  # Threshold for changepoint detection
-            changepoints.append(i)
-
-print(f"Detected {len(changepoints)} changepoints")
+# Load specific sector data
+dataset = load_dataset("brandonyeequon/stock-market-data-warehouse", 
+                      data_files="15_min_interval_stocks/Technology/*.csv")
 ```
 
-## Configuration
+### Local Generation
+Use the included tools to generate your own dataset:
 
-### AlphaVantage API Configuration
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-Set up your API configuration in the data client files:
+# Configure your AlphaVantage API key
+export ALPHAVANTAGE_API_KEY="your_key_here"
+
+# Generate data for specific tickers
+python data_clients/pull_by_ticker.py
+```
+
+## 📊 Dataset Statistics
+
+- **Total Files**: 6,564 CSV files
+- **Data Points**: Billions of individual price records
+- **Time Span**: 25+ years of market data
+- **Update Frequency**: 15-minute intervals
+- **Coverage**: Complete US stock market representation
+- **Quality**: Validated, cleaned, and error-corrected
+
+## 🔧 API Configuration
+
+### AlphaVantage Setup
+
+1. Get your free API key: [AlphaVantage](https://www.alphavantage.co/)
+2. Configure in the data clients:
 
 ```python
 # In data_clients/pull_by_ticker.py
 API_KEY = "your_alphavantage_api_key_here"
-BASE_URL = "https://www.alphavantage.co/query"
 ```
 
-### DSM-BOCD Parameters
+## 📈 Use Cases
 
-Key parameters for tuning DSM-BOCD performance:
+This dataset is perfect for:
 
-- `mean0`: Initial mean estimate
-- `var0`: Initial variance estimate  
-- `varx`: Observation noise variance
-- `lam`: Expected run length (hazard parameter)
-- `omega`: State evolution parameters
+- **Quantitative Finance Research**: High-frequency trading strategies
+- **Machine Learning**: Price prediction and pattern recognition  
+- **Market Analysis**: Sector performance and correlation studies
+- **Academic Research**: Financial markets and economic studies
+- **Algorithm Development**: Testing trading strategies and indicators
+- **Risk Management**: Portfolio optimization and risk assessment
 
-## Contributing
+## 🎯 Bonus: Changepoint Detection
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+As a bonus feature, this repository includes experimental changepoint detection algorithms:
 
-## License
+- **DSM-BOCD**: Dynamic State Model Bayesian Online Changepoint Detection
+- **Nonparametric methods**: KDE-based changepoint detection
+- **Real-time processing**: Online algorithms for streaming data
+
+Perfect for detecting regime changes, market crashes, and volatility shifts in the financial data.
+
+## 📝 Installation
+
+```bash
+git clone https://github.com/brandonyeequon/stock-data-changepoint-detection.git
+cd stock-data-changepoint-detection
+pip install -r requirements.txt
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Please feel free to:
+- Add new data sources or APIs
+- Improve data validation and cleaning
+- Enhance the changepoint detection algorithms
+- Add new analysis tools and utilities
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Citation
+## 🙏 Acknowledgments
 
-If you use this code in your research, please cite:
+- **AlphaVantage** for providing comprehensive stock market data API
+- **Hugging Face** for hosting the massive dataset
+- **Contributors** to the financial data and research community
 
-```bibtex
-@misc{stock-changepoint-detection,
-    title={Stock Data Generation and Changepoint Detection Toolkit},
-    author={Brandon Yee Quon},
-    year={2025},
-    url={https://github.com/brandonyeequon/stock-data-changepoint-detection}
-}
-```
-
-## Acknowledgments
-
-- DSM-BOCD algorithm implementation based on research in Bayesian changepoint detection
-- AlphaVantage for providing stock market data API
-- Contributors to the original BOCD research and implementations
-
-## Support
+## 📞 Support
 
 For questions, issues, or contributions, please open an issue on GitHub or contact me.
