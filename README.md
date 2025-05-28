@@ -1,6 +1,6 @@
 # Stock Data Generation & Changepoint Detection
 
-A comprehensive toolkit for generating raw stock market data and detecting changepoints using advanced Bayesian methods.
+A comprehensive toolkit for generating raw stock market data with alphavantage. It also contains many experimental changepoint detection algorithms I have been experimenting with.
 
 ## Overview
 
@@ -227,4 +227,4 @@ If you use this code in your research, please cite:
 
 ## Support
 
-For questions, issues, or contributions, please open an issue on GitHub or contact the maintainers.
+For questions, issues, or contributions, please open an issue on GitHub or contact me.
