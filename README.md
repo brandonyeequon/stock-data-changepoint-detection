@@ -1,6 +1,6 @@
 # Stock Data Generation & Changepoint Detection
 
-A comprehensive toolkit for generating raw stock market data with alphavantage. It also contains many experimental changepoint detection algorithms I have been experimenting with.
+A comprehensive toolkit for generating raw stock market data with alphavantage. It also contains a few changepoint detection algorithms I have been experimenting with.
 
 ## Overview
 
